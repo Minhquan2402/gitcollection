@@ -1,0 +1,38 @@
+name: CI/CD Build and Push to Docker Hub
+
+# Chạy workflow khi có hành động push vào nhánh main
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout code từ GitHub về máy ảo của Github Actions
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Đăng nhập vào Docker Hub sử dụng Access Token
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # 3. Thiết lập Docker Buildx (hỗ trợ build nâng cao)
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # 4. Build Image và Push lên Docker Hub với Tags
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          # Tags: đẩy lên cả tag 'latest' và tag theo mã hash của commit để dễ quản lý
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/ngt3393-18-03:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/ngt3393-18-03:${{ github.sha }}
