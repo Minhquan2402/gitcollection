@@ -34,5 +34,26 @@ jobs:
           push: true
           # Tags: đẩy lên cả tag 'latest' và tag theo mã hash của commit để dễ quản lý
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/ngt3393-18-03:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/ngt3393-18-03:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/minhquanjava:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/minhquanjava:${{ github.sha }}
+
+      # 5. Triển khai lên DevOps Classroom (Đã sửa lỗi thụt lề và lệnh sed)
+      - name: Triển khai lên DevOps Classroom
+        run: |
+          REPO="${{ secrets.DOCKER_USERNAME }}/minhquanjava"
+          CONTAINER_PORT=80
+          RESPONSE=$(curl -sS -w "\n%{http_code}" -X POST "${{ secrets.DEPLOY_URL }}?repo=$REPO&tag=latest&slot=3&container_port=$CONTAINER_PORT&strict_container_port=0")
+          BODY=$(echo "$RESPONSE" | sed '$d')
+          CODE=$(echo "$RESPONSE" | tail -n1)
+          echo "Webhook HTTP: $CODE"
+          if [ "$CODE" -lt 200 ] || [ "$CODE" -ge 300 ]; then
+            echo "Deploy thất bại. Xem chi tiết trong nhóm log bên dưới."
+            echo "::group::Chi tiết webhook JSON"
+            echo "$BODY" | python3 -m json.tool 2>/dev/null || echo "$BODY"
+            echo "::endgroup::"
+            exit 1
+          fi
+          echo "Deploy thành công."
+          echo "::group::Chi tiết webhook JSON"
+          echo "$BODY" | python3 -m json.tool 2>/dev/null || echo "$BODY"
+          echo "::endgroup::"
