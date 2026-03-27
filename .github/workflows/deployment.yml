@@ -23,4 +23,4 @@ jobs:
       with:
         context: .
         push: true
-        tags: ${{ secrets.DOCKER_USERNAME }}/minhquanjava:latest
+        tags: ${{ secrets.DOCKER_USERNAME }}/ngt3393-18-03
