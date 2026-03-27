@@ -32,12 +32,12 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          # Tags: đẩy lên cả tag 'latest' và tag theo mã hash của commit để dễ quản lý
+          # Đã sửa lại DOCKERHUB_USERNAME thành DOCKER_USERNAME cho đồng bộ
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/minhquanjava:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/minhquanjava:${{ github.sha }}
+            ${{ secrets.DOCKER_USERNAME }}/minhquanjava:latest
+            ${{ secrets.DOCKER_USERNAME }}/minhquanjava:${{ github.sha }}
 
-      # 5. Triển khai lên DevOps Classroom (Đã sửa lỗi thụt lề và lệnh sed)
+      # 5. Triển khai lên DevOps Classroom
       - name: Triển khai lên DevOps Classroom
         run: |
           REPO="${{ secrets.DOCKER_USERNAME }}/minhquanjava"
